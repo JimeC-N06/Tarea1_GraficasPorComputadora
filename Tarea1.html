@@ -1,0 +1,52 @@
+<body>
+<svg width="500" height="300"></svg>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+  const data = [30, 80, 45, 60, 20, 90, 50];
+
+  const svg = d3.select("svg"),
+        width = +svg.attr("width"),
+        height = +svg.attr("height"),
+        margin = {top: 20, right: 30, bottom: 40, left: 40};
+
+  const x = d3.scaleBand()
+              .domain(d3.range(data.length))
+              .range([margin.left, width - margin.right])
+              .padding(0.1);
+
+  const y = d3.scaleLinear()
+              .domain([0, d3.max(data)])
+              .nice()
+              .range([height - margin.bottom, margin.top]);
+
+  // Dibuja barras
+  svg.selectAll("rect")
+     .data(data)
+     .join("rect")
+     .attr("x", (d, i) => x(i))
+     .attr("y", d => y(d))
+     .attr("height", d => y(0) - y(d))
+     .attr("width", x.bandwidth())
+     .attr("fill", "steelblue");
+
+  svg.selectAll("text.label")
+     .data(data)
+     .join("text")
+     .attr("class", "label")
+     .attr("x", (d, i) => x(i) + x.bandwidth()/2)
+     .attr("y", d => y(d) - 5)
+     .attr("text-anchor", "middle")
+     .text(d => d);
+
+  // Eje X
+  svg.append("g")
+     .attr("transform", `translate(0,${height - margin.bottom})`)
+     .call(d3.axisBottom(x).tickFormat(i => `Dato ${i+1}`));
+
+  // Eje Y
+  svg.append("g")
+     .attr("transform", `translate(${margin.left},0)`)
+     .call(d3.axisLeft(y));
+</script>
+</body>
